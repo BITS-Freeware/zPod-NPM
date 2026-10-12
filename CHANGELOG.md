@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.39.0
+
+- The hosted server at `https://zpod.cc/mcp` now supports OAuth sign-in (zPod 1.100.0 or later), so apps that connect only through OAuth, such as the Claude and ChatGPT apps, can add it as a connector. The README's Hosted Server section explains both ways to connect. The tools are unchanged.
+
 ## 1.38.0
 
 Tools for shows and custom domains, which need zPod 1.99.0 or later.
