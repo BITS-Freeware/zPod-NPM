@@ -1,5 +1,10 @@
 name: Release
 
+# Publishes to npm when a GitHub release tagged v<version> is published.
+# Uses npm trusted publishing (OIDC), so no npm token is stored here. The
+# very first publish of a new package can't use OIDC yet; for that one run,
+# an NPM_TOKEN secret is used if present and should be deleted afterwards.
+
 on:
   release:
     types: [published]
@@ -11,14 +16,15 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment: npm
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           registry-url: https://registry.npmjs.org
           cache: npm
+      # Trusted publishing needs npm 11.5.1 or later.
+      - run: npm install -g npm@^11.5.1
       - name: Check the tag and license
         env:
           TAG: ${{ github.event.release.tag_name }}
