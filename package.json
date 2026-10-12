@@ -2,7 +2,7 @@
   "name": "@zpod/mcp",
   "version": "1.35.0",
   "description": "MCP server for zPod. Runs locally over stdio and wraps the zPod REST API (/api/v1) with your API token.",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "zpod-mcp": "dist/cli.js"
