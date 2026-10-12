@@ -31,6 +31,12 @@ describe("zpod mcp", () => {
       "whoami",
       "list_shows",
       "get_show",
+      "create_show",
+      "update_show",
+      "set_show_cover",
+      "get_custom_domain",
+      "set_custom_domain",
+      "check_custom_domain",
       "list_directory_links",
       "parse_directory_link",
       "find_directory_listings",
@@ -54,12 +60,47 @@ describe("zpod mcp", () => {
       "publish_as_archive",
     ]);
     expect(names).not.toContain("delete_episode");
+    expect(names).not.toContain("delete_show");
+    expect(names).not.toContain("remove_custom_domain");
     for (const tool of MCP_TOOLS) {
       const props = (tool.inputSchema.properties ?? {}) as Record<string, unknown>;
       expect(Object.keys(props).some((k) => k.toLowerCase().includes("base64") || k.toLowerCase().includes("audio_bytes"))).toBe(
         false,
       );
     }
+  });
+
+  it("creates and edits shows and sets a custom domain, with no removal tool", async () => {
+    const calls: Array<{ method: string; url: string; body?: string }> = [];
+    const client = new ZpodApiClient({
+      token: "zpod_live_test",
+      baseUrl: "https://zpod.cc",
+      fetchImpl: mockFetch((url, init) => {
+        calls.push({ method: String(init?.method || "GET"), url, body: typeof init?.body === "string" ? init.body : undefined });
+        return { status: 200, body: { ok: true } };
+      }),
+    });
+    await callMcpTool("create_show", { title: "New Show", studio_id: "org1", time_zone: "America/Chicago" }, client);
+    expect(calls.at(-1)).toMatchObject({ method: "POST", url: "https://zpod.cc/api/v1/shows" });
+    expect(JSON.parse(calls.at(-1)!.body!)).toEqual({ title: "New Show", studioId: "org1", timeZone: "America/Chicago" });
+    expect((await callMcpTool("create_show", {}, client)).isError).toBe(true);
+
+    await callMcpTool("update_show", { show_id: "s1", explicit: true, owner_email: "host@example.com" }, client);
+    expect(calls.at(-1)).toMatchObject({ method: "PATCH", url: "https://zpod.cc/api/v1/shows/s1" });
+    expect(JSON.parse(calls.at(-1)!.body!)).toEqual({ explicit: true, ownerEmail: "host@example.com" });
+
+    await callMcpTool("set_show_cover", { show_id: "s1", url: "https://example.com/cover.png" }, client);
+    expect(calls.at(-1)).toMatchObject({ method: "POST", url: "https://zpod.cc/api/v1/shows/s1/artwork/url" });
+
+    await callMcpTool("get_custom_domain", { show_id: "s1" }, client);
+    expect(calls.at(-1)).toMatchObject({ method: "GET", url: "https://zpod.cc/api/v1/shows/s1/custom-domain" });
+    await callMcpTool("set_custom_domain", { show_id: "s1", hostname: "pod.example.com" }, client);
+    expect(calls.at(-1)).toMatchObject({ method: "PUT", url: "https://zpod.cc/api/v1/shows/s1/custom-domain" });
+    const before = calls.length;
+    expect((await callMcpTool("set_custom_domain", { show_id: "s1", hostname: " " }, client)).isError).toBe(true);
+    expect(calls.length).toBe(before);
+    await callMcpTool("check_custom_domain", { show_id: "s1" }, client);
+    expect(calls.at(-1)).toMatchObject({ method: "POST", url: "https://zpod.cc/api/v1/shows/s1/custom-domain/check" });
   });
 
   it("wraps /api/v1 and maps insufficient_scope on publish", async () => {

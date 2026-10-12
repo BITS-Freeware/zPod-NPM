@@ -4,7 +4,7 @@ import type { ZpodApiClient } from "./client.js";
 export const MCP_PROTOCOL_VERSION = "2025-03-26";
 export const MCP_SERVER_NAME = "zpod";
 // Keep in step with package.json; a test checks they match.
-export const MCP_SERVER_VERSION = "1.37.0";
+export const MCP_SERVER_VERSION = "1.38.0";
 
 export type JsonRpcRequest = {
   jsonrpc?: string;

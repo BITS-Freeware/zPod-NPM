@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.38.0
+
+Tools for shows and custom domains, which need zPod 1.99.0 or later.
+
+- `create_show` creates a show in one of the account's studios. `update_show` changes its settings. `set_show_cover` sets the cover from a public PNG or JPEG URL. These need the `shows:write` scope.
+- `get_custom_domain` reads a show's custom domain and the DNS record to add. `set_custom_domain` adds or changes the domain, and `check_custom_domain` runs Check Hostname. Setting and checking need the `domains:write` scope.
+- There is no tool to delete a show or remove a custom domain. Both stay in Studio.
+
 ## 1.37.0
 
 Tools for archive episodes, which need zPod 1.98.0 or later.
