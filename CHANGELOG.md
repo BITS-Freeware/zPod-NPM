@@ -1,12 +1,16 @@
 # Changelog
 
-## 1.39.0
+## 1.40.0
 
-Transcript generation settings, which need zPod 1.102.0 or later.
+Transcript generation settings, which need zPod 1.104.0 or later.
 
 - `create_show` and `update_show` take `transcript_generation`: `disabled`, `disabled_per_episode` (zPod's default), `enabled`, or `enabled_per_episode`. It decides whether zPod writes a transcript from each episode's audio.
 - `create_episode` and `update_episode` take `transcript_generation` (`enabled`, `disabled`, or `show`) to override the show on a Per Episode show.
 - New `set_transcript_generation` tool turns generation on or off for one episode on any status, and queues a transcript when the episode already has audio. It needs the `episodes:write` scope.
+
+## 1.39.0
+
+- The hosted server at `https://zpod.cc/mcp` now supports OAuth sign-in (zPod 1.100.0 or later), so apps that connect only through OAuth, such as the Claude and ChatGPT apps, can add it as a connector. The README's Hosted Server section explains both ways to connect. The tools are unchanged.
 
 ## 1.38.0
 
