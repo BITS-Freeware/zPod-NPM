@@ -49,6 +49,8 @@ describe("zpod mcp", () => {
       "validate_episode",
       "publish_episode",
       "unpublish_episode",
+      "list_archive_candidates",
+      "publish_as_archive",
     ]);
     expect(names).not.toContain("delete_episode");
     for (const tool of MCP_TOOLS) {
@@ -92,6 +94,37 @@ describe("zpod mcp", () => {
     expect(scheduled.isError).toBe(false);
     expect(calls.at(-1)?.url).toContain("/schedule");
     expect(calls.at(-1)?.body).toContain("publishedAt");
+  });
+
+  it("lists drafts without audio and publishes them as archive episodes", async () => {
+    const calls: Array<{ method: string; url: string; body?: string }> = [];
+    const client = new ZpodApiClient({
+      token: "zpod_live_test",
+      baseUrl: "https://zpod.cc",
+      fetchImpl: mockFetch((url, init) => {
+        calls.push({ method: String(init?.method || "GET"), url, body: typeof init?.body === "string" ? init.body : undefined });
+        return { status: 200, body: { ok: true } };
+      }),
+    });
+    await callMcpTool("list_episodes", { show_id: "s1", status: "draft", has_audio: false, limit: 200, offset: 200 }, client);
+    const listUrl = new URL(calls.at(-1)!.url);
+    expect(listUrl.pathname).toBe("/api/v1/shows/s1/episodes");
+    expect(Object.fromEntries(listUrl.searchParams)).toEqual({ status: "draft", limit: "200", offset: "200", hasAudio: "false" });
+
+    await callMcpTool("list_archive_candidates", { show_id: "s1" }, client);
+    expect(calls.at(-1)).toMatchObject({ method: "GET", url: "https://zpod.cc/api/v1/shows/s1/episodes/archive-candidates" });
+
+    await callMcpTool("publish_as_archive", { show_id: "s1", episode_ids: ["e1", "e2"] }, client);
+    expect(calls.at(-1)).toMatchObject({ method: "POST", url: "https://zpod.cc/api/v1/shows/s1/episodes/publish-archive" });
+    expect(JSON.parse(calls.at(-1)!.body!)).toEqual({ episodeIds: ["e1", "e2"] });
+
+    await callMcpTool("publish_as_archive", { show_id: "s1", all: true }, client);
+    expect(JSON.parse(calls.at(-1)!.body!)).toEqual({ all: true });
+
+    const before = calls.length;
+    const missing = await callMcpTool("publish_as_archive", { show_id: "s1" }, client);
+    expect(missing.isError).toBe(true);
+    expect(calls.length).toBe(before);
   });
 
   it("handles MCP initialize and tools/list over JSON-RPC", async () => {

@@ -49,7 +49,7 @@ Most clients take the same JSON block. Put your token in the `env` section, not 
 | `find_directory_listings` | Looks a show up on Apple Podcasts and Podcast Index and proposes ids. |
 | `confirm_directory_listing` | Saves a proposal from `find_directory_listings`. |
 | `set_directory_link` | Saves a directory link for a show. |
-| `list_episodes` | Lists a show's episodes, optionally by status. |
+| `list_episodes` | Lists a show's episodes, optionally by status and by whether they have audio. Pages with `limit` and `offset`. |
 | `get_episode` | Gets episode metadata, enclosure, artwork, chapters, and transcript URLs. |
 | `create_episode` | Creates a draft episode. It never publishes. |
 | `update_episode` | Updates a draft or scheduled episode. |
@@ -63,6 +63,8 @@ Most clients take the same JSON block. Put your token in the `env` section, not 
 | `validate_episode` | Runs the publish checklist with no side effects. |
 | `publish_episode` | Publishes now, or schedules when `published_at` is set. Needs the `publish` scope. |
 | `unpublish_episode` | Returns an episode to draft. Files stay. Needs the `publish` scope. |
+| `list_archive_candidates` | Lists imported drafts with no usable audio, with the reason for each, for a backlog imported from a show that kept audio only for a recent window. |
+| `publish_as_archive` | Publishes those drafts as archive episodes: original date kept, listed on the show's website, left out of RSS, no podcast app notifications. Needs the `publish` scope. |
 
 There is no delete tool.
 

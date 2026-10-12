@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.36.0
+
+Tools for archive episodes, which need zPod 1.97.0 or later.
+
+- `list_episodes` takes `has_audio` and `offset`.
+- `list_archive_candidates` lists imported drafts with no usable audio and why.
+- `publish_as_archive` publishes the eligible ones as archive episodes, by id or all at once.
+
 ## 1.35.0
 
 First release from this repository.
