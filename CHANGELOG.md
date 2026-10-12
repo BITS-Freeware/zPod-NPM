@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.39.1
+
+- Release workflow only: `npm publish` now logs verbosely, so a failed trusted-publishing token exchange shows its reason. The 1.38.0 and 1.39.0 releases did not reach npm; this release carries their changes. The package itself is unchanged.
+
 ## 1.39.0
 
 - The hosted server at `https://zpod.cc/mcp` now supports OAuth sign-in (zPod 1.100.0 or later), so apps that connect only through OAuth, such as the Claude and ChatGPT apps, can add it as a connector. The README's Hosted Server section explains both ways to connect. The tools are unchanged.
