@@ -77,6 +77,7 @@ The hosted server takes API tokens only. It has no sign-in flow, so apps that co
 | `get_artwork_upload_url` | Returns a presigned URL for episode artwork. |
 | `commit_artwork` | Attaches uploaded artwork. |
 | `set_chapters` | Replaces the episode's Podcasting 2.0 chapters. |
+| `set_transcript_generation` | Turns speech-to-text transcript generation on or off for one episode, when the show's setting is a Per Episode one. Needs the `episodes:write` scope. |
 | `get_transcript_upload_url` | Returns a presigned URL for a WebVTT or plain-text transcript. |
 | `commit_transcript` | Attaches an uploaded transcript. |
 | `validate_episode` | Runs the publish checklist with no side effects. |
