@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.37.0
+
+Tools for archive episodes, which need zPod 1.98.0 or later.
+
+- `list_episodes` takes `has_audio` and `offset`.
+- `list_archive_candidates` lists imported drafts with no usable audio and why.
+- `publish_as_archive` publishes the eligible ones as archive episodes, by id or all at once.
+
 ## 1.36.0
 
 - New `whoami` tool. It calls `GET /api/v1/me` and returns the account the token acts for, the studios and show count it reaches, and its scopes, with a plain-words hint when the token reaches no shows. Needs zPod 1.97.0 or later.

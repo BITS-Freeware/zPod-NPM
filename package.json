@@ -1,6 +1,6 @@
 {
   "name": "@zpod/mcp",
-  "version": "1.36.0",
+  "version": "1.37.0",
   "description": "MCP server for zPod. Runs locally over stdio and wraps the zPod REST API (/api/v1) with your API token.",
   "license": "MIT",
   "type": "module",

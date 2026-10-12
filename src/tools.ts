@@ -93,7 +93,8 @@ export const MCP_TOOLS: McpTool[] = [
   },
   {
     name: "list_episodes",
-    description: "List episodes for a show. Optional status filter: draft, scheduled, published, unlisted.",
+    description:
+      "List episodes for a show. Optional filters: status (draft, scheduled, published, unlisted) and has_audio. Pages with limit (max 200) and offset; the reply has total and nextOffset.",
     inputSchema: {
       type: "object",
       required: ["show_id"],
@@ -101,7 +102,9 @@ export const MCP_TOOLS: McpTool[] = [
       properties: {
         show_id: { type: "string" },
         status: { type: "string", enum: ["draft", "scheduled", "published", "unlisted"] },
+        has_audio: { type: "boolean", description: "true: only episodes with playable media. false: only episodes without." },
         limit: { type: "integer" },
+        offset: { type: "integer" },
       },
     },
   },
@@ -281,6 +284,27 @@ export const MCP_TOOLS: McpTool[] = [
     description: "Soft-hide to draft. Files stay. Requires token publish scope.",
     inputSchema: idSchema("episode_id", "Episode id"),
   },
+  {
+    name: "list_archive_candidates",
+    description:
+      "For a backlog imported from a show that kept audio only for a recent window: imported drafts with no usable audio, each with a reason. eligible (no enclosure in the source, or the audio returned 404/410) can be published as archive episodes; attention (other copy failures) should be retried from the import instead.",
+    inputSchema: idSchema("show_id", "Show id"),
+  },
+  {
+    name: "publish_as_archive",
+    description:
+      "Publish imported drafts whose source audio is gone as archive episodes: keeps GUID and original date, clears the dead audio reference, lists them on the show's website, keeps them out of RSS, and notifies no podcast apps. Pass episode_ids (up to 5,000) or all: true. Ineligible ids come back in skipped with a reason. Requires token publish scope.",
+    inputSchema: {
+      type: "object",
+      required: ["show_id"],
+      additionalProperties: false,
+      properties: {
+        show_id: { type: "string" },
+        episode_ids: { type: "array", items: { type: "string" }, maxItems: 5000 },
+        all: { type: "boolean", description: "Every eligible draft in the show." },
+      },
+    },
+  },
 ];
 
 export function mcpToolResult(result: ZpodApiResult) {
@@ -375,8 +399,28 @@ export async function callMcpTool(name: string, rawArgs: unknown, client: ZpodAp
       if (!showId) return missing("show_id");
       const status = typeof args.status === "string" ? args.status : undefined;
       const limit = args.limit != null ? String(args.limit) : undefined;
+      const offset = args.offset != null ? String(args.offset) : undefined;
+      const hasAudio = typeof args.has_audio === "boolean" ? String(args.has_audio) : undefined;
       return mcpToolResult(
-        await client.request("GET", `/api/v1/shows/${encodeURIComponent(showId)}/episodes`, { query: { status, limit } }),
+        await client.request("GET", `/api/v1/shows/${encodeURIComponent(showId)}/episodes`, {
+          query: { status, limit, offset, hasAudio },
+        }),
+      );
+    }
+    case "list_archive_candidates": {
+      const showId = showIdOf(args);
+      if (!showId) return missing("show_id");
+      return mcpToolResult(await client.request("GET", `/api/v1/shows/${encodeURIComponent(showId)}/episodes/archive-candidates`));
+    }
+    case "publish_as_archive": {
+      const showId = showIdOf(args);
+      if (!showId) return missing("show_id");
+      const ids = Array.isArray(args.episode_ids) ? args.episode_ids.filter((id): id is string => typeof id === "string") : [];
+      if (args.all !== true && !ids.length) return missing("episode_ids or all");
+      return mcpToolResult(
+        await client.request("POST", `/api/v1/shows/${encodeURIComponent(showId)}/episodes/publish-archive`, {
+          json: args.all === true ? { all: true } : { episodeIds: ids },
+        }),
       );
     }
     case "get_episode": {
