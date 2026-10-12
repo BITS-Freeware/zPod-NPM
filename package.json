@@ -1,0 +1,58 @@
+{
+  "name": "@zpod/mcp",
+  "version": "1.35.0",
+  "description": "MCP server for zPod. Runs locally over stdio and wraps the zPod REST API (/api/v1) with your API token.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "bin": {
+    "zpod-mcp": "dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "start": "node dist/cli.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run clean && npm run typecheck && npm test && npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "zpod",
+    "mcp",
+    "model-context-protocol",
+    "podcast",
+    "podcasting"
+  ],
+  "homepage": "https://github.com/Bristlecone-IT-Services/zPod-NPM#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bristlecone-IT-Services/zPod-NPM.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Bristlecone-IT-Services/zPod-NPM/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Check the packed files
+        run: |
+          npm pack --dry-run --json > pack.json
+          node -e '
+            const files = JSON.parse(require("fs").readFileSync("pack.json", "utf8"))[0].files.map((f) => f.path);
+            const bad = files.filter((p) => !/^(dist\/[^/]+\.(js|d\.ts)|package\.json|README\.md|CHANGELOG\.md|LICENSE)$/.test(p) || /\.test\./.test(p));
+            if (bad.length) { console.error("Unexpected files in package:", bad); process.exit(1); }
+            if (!files.includes("dist/cli.js")) { console.error("dist/cli.js missing"); process.exit(1); }
+          '
