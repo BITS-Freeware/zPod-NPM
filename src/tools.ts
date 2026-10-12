@@ -22,6 +22,12 @@ const idSchema = (name: string, description: string) => ({
 
 export const MCP_TOOLS: McpTool[] = [
   {
+    name: "whoami",
+    description:
+      "Which zPod account this API token acts for, the studios and show count it reaches, and its scopes. Call this first. A hint says why the token reaches no shows.",
+    inputSchema: { type: "object", additionalProperties: false, properties: {} },
+  },
+  {
     name: "list_shows",
     description: "List shows visible to this API token. Returns ids and canonical rss.podfora.com feed URLs. Never include audio bytes.",
     inputSchema: { type: "object", additionalProperties: false, properties: {} },
@@ -327,6 +333,8 @@ function missing(field: string) {
 export async function callMcpTool(name: string, rawArgs: unknown, client: ZpodApiClient) {
   const args = rawArgs && typeof rawArgs === "object" && !Array.isArray(rawArgs) ? (rawArgs as Record<string, unknown>) : {};
   switch (name) {
+    case "whoami":
+      return mcpToolResult(await client.request("GET", "/api/v1/me"));
     case "list_shows":
       return mcpToolResult(await client.request("GET", "/api/v1/shows"));
     case "get_show": {

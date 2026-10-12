@@ -1,6 +1,6 @@
 {
   "name": "@zpod/mcp",
-  "version": "1.36.0",
+  "version": "1.37.0",
   "description": "MCP server for zPod. Runs locally over stdio and wraps the zPod REST API (/api/v1) with your API token.",
   "license": "MIT",
   "type": "module",
@@ -38,13 +38,13 @@
     "podcast",
     "podcasting"
   ],
-  "homepage": "https://github.com/Bristlecone-IT-Services/zPod-NPM#readme",
+  "homepage": "https://github.com/BITS-Freeware/zPod-NPM#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Bristlecone-IT-Services/zPod-NPM.git"
+    "url": "git+https://github.com/BITS-Freeware/zPod-NPM.git"
   },
   "bugs": {
-    "url": "https://github.com/Bristlecone-IT-Services/zPod-NPM/issues"
+    "url": "https://github.com/BITS-Freeware/zPod-NPM/issues"
   },
   "publishConfig": {
     "access": "public",
