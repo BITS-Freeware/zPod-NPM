@@ -2,11 +2,15 @@
 
 ## 1.40.0
 
-Transcript generation settings, which need zPod 1.104.0 or later.
+Transcript generation settings, which need zPod 1.105.0 or later.
 
 - `create_show` and `update_show` take `transcript_generation`: `disabled`, `disabled_per_episode` (zPod's default), `enabled`, or `enabled_per_episode`. It decides whether zPod writes a transcript from each episode's audio.
 - `create_episode` and `update_episode` take `transcript_generation` (`enabled`, `disabled`, or `show`) to override the show on a Per Episode show.
 - New `set_transcript_generation` tool turns generation on or off for one episode on any status, and queues a transcript when the episode already has audio. It needs the `episodes:write` scope.
+
+## 1.39.1
+
+- Release workflow only: `npm publish` now logs verbosely, so a failed trusted-publishing token exchange shows its reason. The 1.38.0 and 1.39.0 releases did not reach npm; this release carries their changes. The package itself is unchanged.
 
 ## 1.39.0
 
