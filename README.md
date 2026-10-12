@@ -95,7 +95,7 @@ npm run build
 
 ## Versioning and Releases
 
-Versions follow `a.b.c`: `a` for a major release or rewrite, `b` for a feature release, and `c` for a fix. Publishing a GitHub release tagged `v<version>` publishes that version to npm through npm trusted publishing, with provenance. See [CHANGELOG.md](CHANGELOG.md).
+Versions follow `a.b.c`: `a` for a major release or rewrite, `b` for a feature release, and `c` for a fix. Pushing a `v<version>` tag, or creating a GitHub release with a new `v<version>` tag, publishes that version to npm through npm trusted publishing, with provenance. See [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

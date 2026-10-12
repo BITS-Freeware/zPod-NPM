@@ -38,13 +38,13 @@
     "podcast",
     "podcasting"
   ],
-  "homepage": "https://github.com/Bristlecone-IT-Services/zPod-NPM#readme",
+  "homepage": "https://github.com/BITS-Freeware/zPod-NPM#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Bristlecone-IT-Services/zPod-NPM.git"
+    "url": "git+https://github.com/BITS-Freeware/zPod-NPM.git"
   },
   "bugs": {
-    "url": "https://github.com/Bristlecone-IT-Services/zPod-NPM/issues"
+    "url": "https://github.com/BITS-Freeware/zPod-NPM/issues"
   },
   "publishConfig": {
     "access": "public",
