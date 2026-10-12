@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.36.0
+
+- New `whoami` tool. It calls `GET /api/v1/me` and returns the account the token acts for, the studios and show count it reaches, and its scopes, with a plain-words hint when the token reaches no shows. Needs zPod 1.97.0 or later.
+
 ## 1.35.0
 
 First release from this repository.

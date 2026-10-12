@@ -42,6 +42,7 @@ Most clients take the same JSON block. Put your token in the `env` section, not 
 
 | Tool | What it does |
 | --- | --- |
+| `whoami` | Says which account the token acts for, the studios and show count it reaches, and its scopes. Call it first. |
 | `list_shows` | Lists the shows the token can see, with their canonical feed URLs. |
 | `get_show` | Gets one show and its feed URL. |
 | `list_directory_links` | Lists a show's saved and derived directory listing links. |

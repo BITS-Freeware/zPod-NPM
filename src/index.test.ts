@@ -28,6 +28,7 @@ describe("zpod mcp", () => {
   it("lists the tool catalog without audio-byte tools", () => {
     const names = MCP_TOOLS.map((t) => t.name);
     expect(names).toEqual([
+      "whoami",
       "list_shows",
       "get_show",
       "list_directory_links",
@@ -83,6 +84,10 @@ describe("zpod mcp", () => {
     expect(listed.content[0]?.text).toContain("rss.podfora.com");
     expect(calls[0]?.url).toBe("https://zpod.cc/api/v1/shows");
     expect(calls[0]?.method).toBe("GET");
+
+    await callMcpTool("whoami", {}, client);
+    expect(calls.at(-1)?.url).toBe("https://zpod.cc/api/v1/me");
+    expect(calls.at(-1)?.method).toBe("GET");
 
     const denied = await callMcpTool("publish_episode", { episode_id: "e1" }, client);
     expect(denied.isError).toBe(true);
