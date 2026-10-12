@@ -2,7 +2,7 @@
 
 ## 1.40.0
 
-Transcript generation settings, which need zPod 1.105.0 or later.
+Transcript generation settings, which need zPod 1.106.0 or later.
 
 - `create_show` and `update_show` take `transcript_generation`: `disabled`, `disabled_per_episode` (zPod's default), `enabled`, or `enabled_per_episode`. It decides whether zPod writes a transcript from each episode's audio.
 - `create_episode` and `update_episode` take `transcript_generation` (`enabled`, `disabled`, or `show`) to override the show on a Per Episode show.
