@@ -57,6 +57,12 @@ export const MCP_TOOLS: McpTool[] = [
         subcategory: { type: "string" },
         owner_email: { type: "string" },
         copyright: { type: "string" },
+        transcript_generation: {
+          type: "string",
+          enum: ["disabled", "disabled_per_episode", "enabled", "enabled_per_episode"],
+          description:
+            "Speech-to-text for new audio. disabled: never. disabled_per_episode (default): off unless an episode turns it on. enabled: every episode. enabled_per_episode: on unless an episode turns it off.",
+        },
       },
     },
   },
@@ -78,6 +84,12 @@ export const MCP_TOOLS: McpTool[] = [
         copyright: { type: "string" },
         time_zone: { type: "string" },
         download_filename_strategy: { type: "string" },
+        transcript_generation: {
+          type: "string",
+          enum: ["disabled", "disabled_per_episode", "enabled", "enabled_per_episode"],
+          description:
+            "Speech-to-text for new audio. disabled: never. disabled_per_episode (default): off unless an episode turns it on. enabled: every episode. enabled_per_episode: on unless an episode turns it off.",
+        },
         owner_email: { type: "string" },
         category: { type: "string" },
         subcategory: { type: "string" },
@@ -209,6 +221,12 @@ export const MCP_TOOLS: McpTool[] = [
         explicit: { type: "boolean" },
         episode_type: { type: "string" },
         published_at: { type: "string", description: "Stored as draft metadata only until publish/schedule." },
+        transcript_generation: {
+          type: "string",
+          enum: ["enabled", "disabled", "show"],
+          description:
+            "Per-episode override. Only shows set to disabled_per_episode or enabled_per_episode take one; show clears it.",
+        },
       },
     },
   },
@@ -229,6 +247,12 @@ export const MCP_TOOLS: McpTool[] = [
         explicit: { type: "boolean" },
         episode_type: { type: "string" },
         published_at: { type: "string" },
+        transcript_generation: {
+          type: "string",
+          enum: ["enabled", "disabled", "show"],
+          description:
+            "Per-episode override. Only shows set to disabled_per_episode or enabled_per_episode take one; show clears it.",
+        },
       },
     },
   },
@@ -309,6 +333,20 @@ export const MCP_TOOLS: McpTool[] = [
             },
           },
         },
+      },
+    },
+  },
+  {
+    name: "set_transcript_generation",
+    description:
+      "Turn speech-to-text transcript generation on or off for one episode, on any status. Only shows whose transcript_generation is disabled_per_episode or enabled_per_episode accept it (409 transcript_generation_locked otherwise). Turning it on queues a transcript when the episode already has audio and no transcript. Requires token episodes:write scope.",
+    inputSchema: {
+      type: "object",
+      required: ["episode_id", "generation"],
+      additionalProperties: false,
+      properties: {
+        episode_id: { type: "string" },
+        generation: { type: "string", enum: ["enabled", "disabled", "show"], description: "show follows the show setting." },
       },
     },
   },
@@ -418,6 +456,7 @@ function showBody(args: Record<string, unknown>) {
     time_zone: "timeZone",
     feed_mode: "feedMode",
     download_filename_strategy: "downloadFilenameStrategy",
+    transcript_generation: "transcriptGeneration",
     owner_email: "ownerEmail",
     category: "category",
     subcategory: "subcategory",
@@ -613,6 +652,16 @@ export async function callMcpTool(name: string, rawArgs: unknown, client: ZpodAp
       return mcpToolResult(
         await client.request("PUT", `/api/v1/episodes/${encodeURIComponent(episodeId)}/chapters`, {
           json: { chapters: args.chapters },
+        }),
+      );
+    }
+    case "set_transcript_generation": {
+      const episodeId = episodeIdOf(args);
+      if (!episodeId) return missing("episode_id");
+      if (typeof args.generation !== "string" || !args.generation) return missing("generation");
+      return mcpToolResult(
+        await client.request("PUT", `/api/v1/episodes/${encodeURIComponent(episodeId)}/transcript-generation`, {
+          json: { generation: args.generation },
         }),
       );
     }

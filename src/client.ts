@@ -103,6 +103,8 @@ export function createBody(args: Record<string, unknown>) {
   if (args.is_private != null || args.isPrivate != null) body.isPrivate = Boolean(pick(args, "is_private", "isPrivate"));
   const publishedAt = str(pick(args, "published_at", "publishedAt", "publish_at", "publishAt"));
   if (publishedAt) body.publishedAt = publishedAt;
+  const generation = str(pick(args, "transcript_generation", "transcriptGeneration"));
+  if (generation) body.transcriptGeneration = generation;
   return body;
 }
 

@@ -51,6 +51,7 @@ describe("zpod mcp", () => {
       "get_artwork_upload_url",
       "commit_artwork",
       "set_chapters",
+      "set_transcript_generation",
       "get_transcript_upload_url",
       "commit_transcript",
       "validate_episode",
@@ -101,6 +102,29 @@ describe("zpod mcp", () => {
     expect(calls.length).toBe(before);
     await callMcpTool("check_custom_domain", { show_id: "s1" }, client);
     expect(calls.at(-1)).toMatchObject({ method: "POST", url: "https://zpod.cc/api/v1/shows/s1/custom-domain/check" });
+  });
+
+  it("sets transcript generation on shows and episodes", async () => {
+    const calls: Array<{ method: string; url: string; body?: string }> = [];
+    const client = new ZpodApiClient({
+      token: "zpod_live_test",
+      baseUrl: "https://zpod.cc",
+      fetchImpl: mockFetch((url, init) => {
+        calls.push({ method: String(init?.method || "GET"), url, body: typeof init?.body === "string" ? init.body : undefined });
+        return { status: 200, body: { ok: true } };
+      }),
+    });
+    await callMcpTool("update_show", { show_id: "s1", transcript_generation: "enabled_per_episode" }, client);
+    expect(calls.at(-1)).toMatchObject({ method: "PATCH", url: "https://zpod.cc/api/v1/shows/s1" });
+    expect(JSON.parse(calls.at(-1)!.body!)).toEqual({ transcriptGeneration: "enabled_per_episode" });
+    await callMcpTool("create_episode", { show_id: "s1", title: "One", transcript_generation: "enabled" }, client);
+    expect(JSON.parse(calls.at(-1)!.body!)).toMatchObject({ title: "One", transcriptGeneration: "enabled" });
+    await callMcpTool("set_transcript_generation", { episode_id: "e1", generation: "disabled" }, client);
+    expect(calls.at(-1)).toMatchObject({ method: "PUT", url: "https://zpod.cc/api/v1/episodes/e1/transcript-generation" });
+    expect(JSON.parse(calls.at(-1)!.body!)).toEqual({ generation: "disabled" });
+    const before = calls.length;
+    expect((await callMcpTool("set_transcript_generation", { episode_id: "e1" }, client)).isError).toBe(true);
+    expect(calls.length).toBe(before);
   });
 
   it("wraps /api/v1 and maps insufficient_scope on publish", async () => {
