@@ -41,6 +41,8 @@ jobs:
             exit 1
           fi
       - run: npm ci
-      - run: npm publish
+      # --loglevel verbose prints why the trusted-publishing (OIDC) token
+      # exchange failed, which npm otherwise hides behind ENEEDAUTH.
+      - run: npm publish --loglevel verbose
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
