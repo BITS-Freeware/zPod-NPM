@@ -4,7 +4,7 @@
 
 It is a thin wrapper. Every tool call is one request to `https://zpod.cc/api/v1` with your API token, so the server can do exactly what the token can do and nothing more.
 
-zPod also hosts the same tools at `https://zpod.cc/mcp` for clients that connect over HTTP with a Bearer header, so nothing needs installing. See [Hosted Server](#hosted-server).
+zPod also hosts the same tools at `https://zpod.cc/mcp`, for apps that sign in with OAuth and for clients that send a Bearer header, so nothing needs installing. See [Hosted Server](#hosted-server).
 
 ## Requirements
 
@@ -35,13 +35,17 @@ Most clients take the same JSON block. Put your token in the `env` section, not 
 
 ### Hosted Server
 
-Clients that support remote MCP servers with custom headers can skip the install and connect to `https://zpod.cc/mcp` with `Authorization: Bearer zpod_live_...`. For example, in Claude Code:
+You can skip the install and connect to `https://zpod.cc/mcp` in either of two ways.
+
+**Sign in (OAuth).** Apps that add remote MCP servers by URL, such as the Claude and ChatGPT apps, can add `https://zpod.cc/mcp` as a connector. The app opens a zPod page where you sign in and approve the connection. The connection then appears under Account → Developer in zPod, where Disconnect removes it. Needs zPod 1.100.0 or later.
+
+**API token.** Clients that send custom headers can connect with `Authorization: Bearer zpod_live_...` instead. For example, in Claude Code:
 
 ```sh
 claude mcp add --transport http zpod https://zpod.cc/mcp --header "Authorization: Bearer zpod_live_..."
 ```
 
-The hosted server takes API tokens only. It has no sign-in flow, so apps that connect only through OAuth cannot use it yet.
+Both ways need a paid plan, the same as creating an API token.
 
 ### Environment Variables
 
