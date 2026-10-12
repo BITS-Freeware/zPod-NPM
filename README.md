@@ -2,12 +2,14 @@
 
 `@zpod/mcp` is the official [Model Context Protocol](https://modelcontextprotocol.io) server for [zPod](https://zpod.cc). It runs on your own machine over stdio and turns the zPod REST API (`/api/v1`) into tools an AI client can call: list shows, create draft episodes, upload audio through presigned URLs, set chapters and transcripts, validate, and publish.
 
-It is a thin wrapper. Every tool call is one request to `https://zpod.cc/api/v1` with your API token, so the server can do exactly what the token can do and nothing more. There is no hosted version.
+It is a thin wrapper. Every tool call is one request to `https://zpod.cc/api/v1` with your API token, so the server can do exactly what the token can do and nothing more.
+
+zPod also hosts the same tools at `https://zpod.cc/mcp` for clients that connect over HTTP with a Bearer header, so nothing needs installing. See [Hosted Server](#hosted-server).
 
 ## Requirements
 
 - Node.js 20 or later
-- A zPod API token. Create one in Studio under **Account → Developer / API Tokens**. Tokens start with `zpod_live_`. Publishing, scheduling, and unpublishing need a token with the `publish` scope.
+- A zPod API token. Create one in Studio under **Account → Developer / API Tokens**. Tokens need a paid plan and start with `zpod_live_`. Publishing, scheduling, and unpublishing need a token with the `publish` scope.
 
 ## Set Up Your Client
 
@@ -31,6 +33,16 @@ Most clients take the same JSON block. Put your token in the `env` section, not 
 - **Cursor:** add it to `.cursor/mcp.json` in your project, or to the global MCP settings.
 - **Claude Code:** `claude mcp add zpod --env ZPOD_API_TOKEN=zpod_live_... -- npx -y @zpod/mcp`
 
+### Hosted Server
+
+Clients that support remote MCP servers with custom headers can skip the install and connect to `https://zpod.cc/mcp` with `Authorization: Bearer zpod_live_...`. For example, in Claude Code:
+
+```sh
+claude mcp add --transport http zpod https://zpod.cc/mcp --header "Authorization: Bearer zpod_live_..."
+```
+
+The hosted server takes API tokens only. It has no sign-in flow, so apps that connect only through OAuth cannot use it yet.
+
 ### Environment Variables
 
 | Variable | Required | Meaning |
@@ -45,6 +57,12 @@ Most clients take the same JSON block. Put your token in the `env` section, not 
 | `whoami` | Says which account the token acts for, the studios and show count it reaches, and its scopes. Call it first. |
 | `list_shows` | Lists the shows the token can see, with their canonical feed URLs. |
 | `get_show` | Gets one show and its feed URL. |
+| `create_show` | Creates a show in one of the account's studios. Needs the `shows:write` scope. |
+| `update_show` | Changes a show's title, description, author, language, category, time zone, and similar settings. Needs the `shows:write` scope. |
+| `set_show_cover` | Sets a show's cover from a public PNG or JPEG URL. Needs the `shows:write` scope. |
+| `get_custom_domain` | Reads a show's custom domain, its status, and the DNS record to add. |
+| `set_custom_domain` | Adds or changes a show's custom domain. Needs the `domains:write` scope and an owner or admin role on the show. |
+| `check_custom_domain` | Re-checks DNS for the saved domain and attaches it once it points at zPod. Needs the `domains:write` scope. |
 | `list_directory_links` | Lists a show's saved and derived directory listing links. |
 | `parse_directory_link` | Parses a pasted directory link without saving it. |
 | `find_directory_listings` | Looks a show up on Apple Podcasts and Podcast Index and proposes ids. |
@@ -67,7 +85,7 @@ Most clients take the same JSON block. Put your token in the `env` section, not 
 | `list_archive_candidates` | Lists imported drafts with no usable audio, with the reason for each, for a backlog imported from a show that kept audio only for a recent window. |
 | `publish_as_archive` | Publishes those drafts as archive episodes: original date kept, listed on the show's website, left out of RSS, no podcast app notifications. Needs the `publish` scope. |
 
-There is no delete tool.
+There is no tool that deletes a show or an episode, or removes a custom domain.
 
 ### Uploading Files
 

@@ -38,6 +38,85 @@ export const MCP_TOOLS: McpTool[] = [
     inputSchema: idSchema("show_id", "Show id"),
   },
   {
+    name: "create_show",
+    description:
+      "Create a show in one of the account's studios. Plan show limits apply, as in Studio. studio_id is required when the account belongs to more than one studio (see whoami). Requires token shows:write scope and a token with no show filter.",
+    inputSchema: {
+      type: "object",
+      required: ["title"],
+      additionalProperties: false,
+      properties: {
+        title: { type: "string" },
+        studio_id: { type: "string" },
+        description: { type: "string" },
+        author: { type: "string" },
+        language: { type: "string", description: "Language code, such as en or en-US." },
+        time_zone: { type: "string", description: "City time zone, such as America/Chicago." },
+        feed_mode: { type: "string", enum: ["public", "unlisted", "paid"] },
+        category: { type: "string", description: "Apple Podcasts category." },
+        subcategory: { type: "string" },
+        owner_email: { type: "string" },
+        copyright: { type: "string" },
+      },
+    },
+  },
+  {
+    name: "update_show",
+    description:
+      "Change show settings. Only the fields you pass change. owner_email needs an owner or admin role on the show. Shows cannot be deleted through the API. Requires token shows:write scope.",
+    inputSchema: {
+      type: "object",
+      required: ["show_id"],
+      additionalProperties: false,
+      properties: {
+        show_id: { type: "string" },
+        title: { type: "string" },
+        description: { type: "string" },
+        author: { type: "string" },
+        language: { type: "string" },
+        explicit: { type: "boolean" },
+        copyright: { type: "string" },
+        time_zone: { type: "string" },
+        download_filename_strategy: { type: "string" },
+        owner_email: { type: "string" },
+        category: { type: "string" },
+        subcategory: { type: "string" },
+      },
+    },
+  },
+  {
+    name: "set_show_cover",
+    description:
+      "Set a show's cover from a public PNG or JPEG URL (at least 1400x1400). WebP and AVIF are refused. Requires token shows:write scope.",
+    inputSchema: {
+      type: "object",
+      required: ["show_id", "url"],
+      additionalProperties: false,
+      properties: { show_id: { type: "string" }, url: { type: "string" } },
+    },
+  },
+  {
+    name: "get_custom_domain",
+    description: "A show's custom domain, its status, whether the studio has the Custom Hostname add-on, and the DNS record to add.",
+    inputSchema: idSchema("show_id", "Show id"),
+  },
+  {
+    name: "set_custom_domain",
+    description:
+      "Add or change a show's custom domain and try to attach it. The reply has the CNAME record to add and a plain-words diagnosis. Removing a domain is not possible through the API; it is done in Studio. Needs the Custom Hostname add-on, an owner or admin role on the show, and token domains:write scope.",
+    inputSchema: {
+      type: "object",
+      required: ["show_id", "hostname"],
+      additionalProperties: false,
+      properties: { show_id: { type: "string" }, hostname: { type: "string" } },
+    },
+  },
+  {
+    name: "check_custom_domain",
+    description: "Check Hostname: re-check DNS for the saved custom domain and attach it once it points at zPod. Requires token domains:write scope.",
+    inputSchema: idSchema("show_id", "Show id"),
+  },
+  {
     name: "list_directory_links",
     description: "List stored and derived Listen Links for a show. Returns normalized https listing URLs. Does not change RSS.",
     inputSchema: idSchema("show_id", "Show id"),
@@ -326,6 +405,28 @@ function formatApiError(result: ZpodApiResult) {
   return JSON.stringify(result.body, null, 2);
 }
 
+/** MCP snake_case show fields to the API's camelCase body. Only fields that were passed are sent. */
+function showBody(args: Record<string, unknown>) {
+  const map: Record<string, string> = {
+    title: "title",
+    studio_id: "studioId",
+    description: "description",
+    author: "author",
+    language: "language",
+    explicit: "explicit",
+    copyright: "copyright",
+    time_zone: "timeZone",
+    feed_mode: "feedMode",
+    download_filename_strategy: "downloadFilenameStrategy",
+    owner_email: "ownerEmail",
+    category: "category",
+    subcategory: "subcategory",
+  };
+  const body: Record<string, unknown> = {};
+  for (const [from, to] of Object.entries(map)) if (args[from] !== undefined) body[to] = args[from];
+  return body;
+}
+
 function missing(field: string) {
   return mcpToolResult({ ok: false, status: 400, body: { error: "invalid_arguments", message: `${field} is required.` } });
 }
@@ -341,6 +442,42 @@ export async function callMcpTool(name: string, rawArgs: unknown, client: ZpodAp
       const showId = showIdOf(args);
       if (!showId) return missing("show_id");
       return mcpToolResult(await client.request("GET", `/api/v1/shows/${encodeURIComponent(showId)}`));
+    }
+    case "create_show": {
+      const title = typeof args.title === "string" ? args.title : "";
+      if (!title) return missing("title");
+      return mcpToolResult(await client.request("POST", "/api/v1/shows", { json: showBody(args) }));
+    }
+    case "update_show": {
+      const showId = showIdOf(args);
+      if (!showId) return missing("show_id");
+      return mcpToolResult(await client.request("PATCH", `/api/v1/shows/${encodeURIComponent(showId)}`, { json: showBody(args) }));
+    }
+    case "set_show_cover": {
+      const showId = showIdOf(args);
+      if (!showId) return missing("show_id");
+      const url = typeof args.url === "string" ? args.url : "";
+      if (!url) return missing("url");
+      return mcpToolResult(await client.request("POST", `/api/v1/shows/${encodeURIComponent(showId)}/artwork/url`, { json: { url } }));
+    }
+    case "get_custom_domain": {
+      const showId = showIdOf(args);
+      if (!showId) return missing("show_id");
+      return mcpToolResult(await client.request("GET", `/api/v1/shows/${encodeURIComponent(showId)}/custom-domain`));
+    }
+    case "set_custom_domain": {
+      const showId = showIdOf(args);
+      if (!showId) return missing("show_id");
+      const hostname = typeof args.hostname === "string" ? args.hostname.trim() : "";
+      if (!hostname) return missing("hostname");
+      return mcpToolResult(
+        await client.request("PUT", `/api/v1/shows/${encodeURIComponent(showId)}/custom-domain`, { json: { hostname } }),
+      );
+    }
+    case "check_custom_domain": {
+      const showId = showIdOf(args);
+      if (!showId) return missing("show_id");
+      return mcpToolResult(await client.request("POST", `/api/v1/shows/${encodeURIComponent(showId)}/custom-domain/check`));
     }
     case "list_directory_links": {
       const showId = showIdOf(args);
