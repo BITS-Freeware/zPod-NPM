@@ -115,7 +115,7 @@ export const MCP_TOOLS: McpTool[] = [
   {
     name: "set_custom_domain",
     description:
-      "Add or change a show's custom domain and try to attach it. The reply has the CNAME record to add and a plain-words diagnosis. Removing a domain is not possible through the API; it is done in Studio. Needs the Custom Hostname add-on, an owner or admin role on the show, and token domains:write scope.",
+      "Add or change a show's custom domain and try to attach it. The reply has the CNAME record to add and a plain-words diagnosis. Removing a domain is not possible through the API; it is done in Studio. Needs the Custom Hostname add-on, a token from the studio owner (each domain is billed to the studio's card; anyone else gets owner_required), and token domains:write scope.",
     inputSchema: {
       type: "object",
       required: ["show_id", "hostname"],

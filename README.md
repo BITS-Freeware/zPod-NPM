@@ -65,7 +65,7 @@ Both ways need a paid plan, the same as creating an API token.
 | `update_show` | Changes a show's title, description, author, language, category, time zone, and similar settings. Needs the `shows:write` scope. |
 | `set_show_cover` | Sets a show's cover from a public PNG or JPEG URL. Needs the `shows:write` scope. |
 | `get_custom_domain` | Reads a show's custom domain, its status, and the DNS record to add. |
-| `set_custom_domain` | Adds or changes a show's custom domain. Needs the `domains:write` scope and an owner or admin role on the show. |
+| `set_custom_domain` | Adds or changes a show's custom domain. Needs the `domains:write` scope and a token from the studio owner, because each domain is billed to the studio's card. |
 | `check_custom_domain` | Re-checks DNS for the saved domain and attaches it once it points at zPod. Needs the `domains:write` scope. |
 | `list_directory_links` | Lists a show's saved and derived directory listing links. |
 | `parse_directory_link` | Parses a pasted directory link without saving it. |

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.40.2
+
+- `set_custom_domain` describes who may use it: only the studio owner's token can save a domain, because each domain is billed to the studio's card. zPod answers 403 `owner_required` for an admin. The tool's behavior is unchanged.
+
 ## 1.40.1
 
 - `get_upload_url`, `get_artwork_upload_url` and `get_transcript_upload_url` now require `byte_size`, the file's exact size in bytes. zPod 1.130.0 and later sign that size into the upload URL, so the PUT must send a file of exactly that size, and a presign without it answers 400 `byte_size_required`.
