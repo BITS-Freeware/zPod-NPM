@@ -261,13 +261,13 @@ export const MCP_TOOLS: McpTool[] = [
     description: "Presign an audio PUT URL. Put the file bytes yourself. Never pass base64 audio through this tool.",
     inputSchema: {
       type: "object",
-      required: ["episode_id"],
+      required: ["episode_id", "byte_size"],
       additionalProperties: false,
       properties: {
         episode_id: { type: "string" },
         filename: { type: "string" },
         content_type: { type: "string" },
-        byte_size: { type: "integer" },
+        byte_size: { type: "integer", description: "Exact file size in bytes. Required: the upload URL accepts only a file of this size." },
       },
     },
   },
@@ -291,13 +291,13 @@ export const MCP_TOOLS: McpTool[] = [
     description: "Presign episode artwork PUT (square PNG/JPEG 1400–3000). Do not send image bytes in the model context.",
     inputSchema: {
       type: "object",
-      required: ["episode_id"],
+      required: ["episode_id", "byte_size"],
       additionalProperties: false,
       properties: {
         episode_id: { type: "string" },
         filename: { type: "string" },
         content_type: { type: "string" },
-        byte_size: { type: "integer" },
+        byte_size: { type: "integer", description: "Exact file size in bytes. Required: the upload URL accepts only a file of this size." },
       },
     },
   },
@@ -355,13 +355,13 @@ export const MCP_TOOLS: McpTool[] = [
     description: "Presign a WebVTT or plain-text transcript PUT. Do not send the transcript file through the model if it is large; use the URL.",
     inputSchema: {
       type: "object",
-      required: ["episode_id"],
+      required: ["episode_id", "byte_size"],
       additionalProperties: false,
       properties: {
         episode_id: { type: "string" },
         filename: { type: "string" },
         content_type: { type: "string" },
-        byte_size: { type: "integer" },
+        byte_size: { type: "integer", description: "Exact file size in bytes. Required: the upload URL accepts only a file of this size." },
       },
     },
   },

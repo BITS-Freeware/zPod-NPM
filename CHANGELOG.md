@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.40.1
+
+- `get_upload_url`, `get_artwork_upload_url` and `get_transcript_upload_url` now require `byte_size`, the file's exact size in bytes. zPod 1.130.0 and later sign that size into the upload URL, so the PUT must send a file of exactly that size, and a presign without it answers 400 `byte_size_required`.
+
 ## 1.40.0
 
 Transcript generation settings, which need zPod 1.106.0 or later.
